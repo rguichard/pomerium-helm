@@ -177,7 +177,7 @@ apiProxy:
   name: "kubernetes"
 
 operator:
-  enabled: false
+  enabled: true
   fullnameOverride: ""
   nameOverride: ""
   replicaCount: 1
@@ -185,7 +185,9 @@ operator:
     repository: "pomerium/pomerium-operator"
     tag: "v0.0.5"
   config:
-    ingressClass: pomerium
+    ingressClasses:
+      - alpha
+      - beta
     serviceClass: pomerium
     debug: false
   deployment:
