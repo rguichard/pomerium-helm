@@ -1,0 +1,56 @@
+name: Release
+permissions:
+  contents: read
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "apparitor"
+          git config user.email "apparitor@users.noreply.github.com"
+
+      - name: Install helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.5.1
+
+      - name: Add bitnami repo
+        run: helm repo add bitnami https://charts.bitnami.com/bitnami
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.4.0
+        env:
+          CR_TOKEN: "${{ secrets.CI_TOKEN }}"
+        with:
+          charts_dir: charts
+          charts_repo_url: https://helm.pomerium.io
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup chart-testing
+        id: lint
+        uses: helm/chart-testing-action@v2.2.1
+
+      - name: Chart linting
+        run: |
+          ct lint --config .ct-release.yaml

@@ -1,0 +1,35 @@
+{{ template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.versionBadge" . }}{{ template "chart.typeBadge" . }}{{ template "chart.appVersionBadge" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+Installation
+-------------
+
+pomerium-console requires the shared secret of your existing databroker and a supported RDBMS backend to install.
+
+```bash
+helm install pomerium-enterprise/pomerium-console \
+    --set database.type=pg \
+    --set database.username=pomerium \
+    --set database.password=strongpassword \
+    --set database.host=pghost.local \
+    --set database.name=pomerium-console \
+    --set config.sharedSecret=ZGVhZGJlZWZkZWFkYmVlZmRlYWRiZWVmCg== \
+    --set config.databaseEncryptionKey=hDiBsQ6MJFr2y9jhT6c2Uu3lHw9/IpULfBJyesjPWpE= \
+    --set config.authenticateServiceUrl=https://authenticate.localhost.pomerium.io \
+    --set config.audience=console.localhost.pomerium.io \
+    --set config.licenseKey=XXXXXXXXXXXXXXXXX
+```
+
+{{ template "chart.valuesSection" . }}

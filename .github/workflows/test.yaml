@@ -1,0 +1,45 @@
+name: Chart Test
+permissions:
+  contents: read
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install helm
+        uses: azure/setup-helm@v1
+        id: install
+        with:
+          version: v3.5.1
+
+      - name: "Add nginx ingress repo"
+        run: "helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
+
+      - name: Setup chart-testing
+        id: lint
+        uses: helm/chart-testing-action@v2.2.1
+
+      - name: Chart linting
+        run: |
+          ct lint --config .ct.yaml
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.2.0
+        with:
+          install_local_path_provisioner: true
+
+      - name: Install Ingress Controller
+        run: "helm install ingress-nginx/ingress-nginx --generate-name --set controller.service.type='NodePort' --set controller.admissionWebhooks.enabled=false"
+
+      - name: Chart install
+        run: |
+          ct install --config .ct.yaml --excluded-charts pomerium-console
